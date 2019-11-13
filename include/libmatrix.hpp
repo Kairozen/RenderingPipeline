@@ -2,7 +2,9 @@
 #define LIBMATRIX_HPP
 
 #include <iostream>
+
 using namespace std;
+
 namespace libmatrix
 {
 	template <int n, class T>
@@ -12,6 +14,14 @@ namespace libmatrix
 		T vec[n];
 
 	public:
+		Vector<n,T>()
+		{
+			for (int i = 0; i < n; ++i)
+				vec[i] = 0;
+		}
+
+		~Vector<n,T>() {}
+
 		/**
 		 * Addresses the i-th element of the vector
 		 * @param i the index of the element
@@ -51,21 +61,33 @@ namespace libmatrix
 		 */
 		Vector<n,T>& to_unit();
 
-		ostream& operator<<(ostream &out);
+		friend ostream& operator<<(ostream &out, const Vector<n,T> v)
+		{
+			out << "(";
+			for(int i = 0; i < n; ++i)
+			{
+				if(i == 0)
+					out << v.vec[i];
+				else
+					out << ", " << v.vec[i];
+			}
+			out << ")";
+			return out;
+		}
 
-		Vector<n,T>& operator[](int i);
+		T& operator[](int i);
 
-		Vector<n,T>& operator+(Vector<n,T>& v);
+		Vector<n,T>& operator+(const Vector<n,T>& v);
 
-		Vector<n,T>& operator+=(Vector<n,T>& v);
+		Vector<n,T>& operator+=(const Vector<n,T>& v);
 
-		Vector<n,T>& operator-(Vector<n,T>& v);
+		Vector<n,T>& operator-(const Vector<n,T>& v);
 
-		Vector<n,T>& operator-=(Vector<n,T>& v);
+		Vector<n,T>& operator-=(const Vector<n,T>& v);
 
-		Vector<n,T>& operator*(Vector<n,T>& v);
+		Vector<n,T>& operator*(const Vector<n,T>& v);
 
-		Vector<n,T>& operator*=(Vector<n,T>& v);
+		Vector<n,T>& operator*=(const Vector<n,T>& v);
 
 	};
 }
