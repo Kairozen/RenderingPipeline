@@ -2,6 +2,9 @@
 #define LIBMATRIX_HPP
 
 #include <iostream>
+#include <cmath>
+#include <cstdarg>
+#include <exception>
 
 using namespace std;
 
@@ -26,40 +29,133 @@ namespace libmatrix
 		 * Addresses the i-th element of the vector
 		 * @param i the index of the element
 		 */
-		T at(int i);
+		T at(int i)
+		{
+			if(i>=n)
+				throw "Given index is out of range (" + to_string(i) + ").";
+			return vec[i];
+		}
 
- 		/**
+		/**
 		 * Cross product with another vector
 		 * @param v the other vector
 		 */
-		float cross(Vector<n,T> &v);
+		Vector<n,float> cross(Vector<n,T> &v)
+		{
+			Vector<n,float> res;
 
- 		/**
+			return res;
+		}
+
+		/**
 		 * Dot product with another vector
 		 * @param v the other vector
 		 */
-		float dot(Vector<n,T> &v);
+		float dot(Vector<n,T> &v)
+		{
+			float res = 0.f;
+			for (int i = 0; i < n; ++i)
+				res += vec[i]*v.vec[i];
+			return res;
+		}
 
- 		/**
+		/**
 		 * Returns true if the vector is orthogonal to another given as an argument, false otherwise
 		 * @param v the other vector
 		 */
-		bool is_ortho(Vector<n,T> &v);
+		bool is_ortho(Vector<n,T> &v)
+		{
+			return dot(v) == 0;
+		}
 
- 		/**
+		/**
 		 * Returns true if the vector contains an invalid value, false otherwise. Notably, if the vector contains nan as values
 		 */
-		bool is_null();
+		bool is_null()
+		{
+			return false;
+		}
 
- 		/**
+		/**
 		 * Returns the norm of the vector
 		 */
-		float norm();
+		float norm()
+		{
+			float norm = 0.f;
+			for (int i = 0; i < n; ++i)
+				norm += vec[i] * vec[i];
+			return sqrt(norm);
+		}
 
- 		/**
+		/**
 		 * Returns a copy of the vector normalised.
 		 */
-		Vector<n,T>& to_unit();
+		Vector<n,float> to_unit()
+		{
+			Vector<n,float> res;
+			float norm = this->norm();
+			for (int i = 0; i < n; ++i)
+				res[i] = (1/norm)*vec[i];
+			return res;
+		}
+
+		T& operator[](int i)
+		{
+			return vec[i];
+		}
+
+		Vector<n,T> operator+(const Vector<n,T>& v)
+		{
+			Vector<n,T> res;
+			for (int i = 0; i < n; ++i)
+				res[i] = vec[i] + v.vec[i];
+			return res;
+		}
+
+		Vector<n,T>& operator+=(const Vector<n,T>& v)
+		{
+			for (int i = 0; i < n; ++i)
+				vec[i] += v.vec[i];
+			return *this;
+		}
+
+		Vector<n,T> operator-(const Vector<n,T>& v)
+		{
+			Vector<n,T> res;
+			for (int i = 0; i < n; ++i)
+				res[i] = vec[i] - v.vec[i];
+			return res;
+		}
+
+		Vector<n,T> operator-()
+		{
+			Vector<n,T> res;
+			for (int i = 0; i < n; i++)
+				res[i] = -vec[i];
+			return res;
+		}
+
+		Vector<n,T>& operator-=(const Vector<n,T>& v)
+		{
+			for (int i = 0; i < n; ++i)
+				vec[i] -= v.vec[i];
+			return *this;
+		}
+		
+		Vector<n,T> operator*(float f)
+		{
+			Vector<n,T> res;
+			for (int i = 0; i < n; ++i)
+				res[i] = vec[i] * f;
+			return res;
+		}
+
+		Vector<n,T>& operator*=(float f)
+		{
+			for (int i = 0; i < n; ++i)
+				vec[i] *= f;
+			return *this;
+		}
 
 		friend ostream& operator<<(ostream &out, const Vector<n,T> v)
 		{
@@ -74,21 +170,6 @@ namespace libmatrix
 			out << ")";
 			return out;
 		}
-
-		T& operator[](int i);
-
-		Vector<n,T>& operator+(const Vector<n,T>& v);
-
-		Vector<n,T>& operator+=(const Vector<n,T>& v);
-
-		Vector<n,T>& operator-(const Vector<n,T>& v);
-
-		Vector<n,T>& operator-=(const Vector<n,T>& v);
-
-		Vector<n,T>& operator*(const Vector<n,T>& v);
-
-		Vector<n,T>& operator*=(const Vector<n,T>& v);
-
 	};
 }
 
