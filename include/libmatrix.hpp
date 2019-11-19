@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstdarg>
 #include <exception>
+#include <typeinfo>
 
 using namespace std;
 
@@ -31,8 +32,9 @@ namespace libmatrix
 		 */
 		T at(int i)
 		{
+			
 			if(i>=n)
-				throw "Given index is out of range (" + to_string(i) + ").";
+				throw out_of_range("Out of range exception : Vector::at(" + to_string(i) + ")");
 			return vec[i];
 		}
 
@@ -42,8 +44,12 @@ namespace libmatrix
 		 */
 		Vector<n,float> cross(Vector<n,T> &v)
 		{
+			if(n < 3)
+				throw runtime_error("Vectors have less than 3 dimensions");
 			Vector<n,float> res;
-
+			res[0] = vec[1]*v.vec[2] - vec[2]*v.vec[1];
+			res[1] = vec[2]*v.vec[0] - vec[0]*v.vec[2];
+			res[2] = vec[0]*v.vec[1] - vec[1]*v.vec[0];
 			return res;
 		}
 
@@ -147,6 +153,16 @@ namespace libmatrix
 			Vector<n,T> res;
 			for (int i = 0; i < n; ++i)
 				res[i] = vec[i] * f;
+			return res;
+		}
+
+		friend Vector<n,float> operator*(float f, const Vector<n,T> v)
+		{
+			Vector<n,float> res;
+			for (int i = 0; i < n; ++i)
+			{
+				res[i] = v.vec[i] * f;
+			}
 			return res;
 		}
 

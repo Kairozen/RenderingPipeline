@@ -30,6 +30,16 @@ int main(int argc, char const *argv[])
 	Vector<2,float> a; a[0] = 1;
 	Vector<2,float> b; b[1] = 1;
 	cout << a.is_ortho(b) << endl;
-	
+	cout << 3 * a << endl;
+	try{
+		//cout << v3.at(8);
+		cout << v3.cross(v3);
+	}
+	catch (exception& e)
+	{
+		cout << e.what() << endl;
+	}
+	cout << v2.cross(v2) << endl;
+	cout << v.cross(v2) << endl;
 	return 0;
 }
