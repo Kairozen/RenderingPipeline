@@ -7,20 +7,36 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-	Vector<3,int> v;
-	v[0] = 1;
-	v[1] = 2;
+	Matrix<4,3, int> m1;
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			m1[i][j] = i+j;
+		}
+	}
 
-	assert(v[0] == 1);
-	assert(v[1] == 2);
-	assert(v[2] == 0);
-	assert(v.at(0) == 1);
-	assert(v.at(1) == 2);
-
+	assert(m1[0][1] == 1);
+	assert(m1[1][1] == 2);
+	assert(m1[2][1] == 3);
+	assert(m1.at(0,0) == 0);
+	assert(m1.at(3,2) == 5);
+	
 	bool exceptionThrown = false;
 	try
 	{
-		v.at(5);
+		m1.at(2,5);
+	}
+	catch (exception e)
+	{
+		exceptionThrown = true;
+	}
+	assert(exceptionThrown);
+	
+	exceptionThrown = false;
+	try
+	{
+		m1.at(5,2);
 	}
 	catch (exception e)
 	{
@@ -28,6 +44,35 @@ int main(int argc, char const *argv[])
 	}
 	assert(exceptionThrown);
 
+	Matrix<4,3,int> m2;
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			m2[i][j] = 1;
+		}
+	}
+
+	m1 += m2;
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			assert(m1.at(i,j) == i+j+1);
+		}
+	}
+
+	Matrix<4,3,int> m3 = m1 + m2;
+
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			assert(m3.at(i,j) == i+j+2);
+		}
+	}
+
+	/*
 	Vector<3,int> v2;
 	v2[0] = 5;
 	v2[1] = -4;
@@ -84,7 +129,7 @@ int main(int argc, char const *argv[])
 	op1+=op2;
 	assert(op1[0] == 6);
 	assert(op1[1] == 8);
-	
+	*/
 	cout << "All is right" << endl;
 	return 0;
 }

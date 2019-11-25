@@ -217,7 +217,7 @@ namespace libmatrix
 
 		T at(int i, int j)
 		{
-			if(i >= m || j >= n)
+			if(i >= n || j >= m)
 				throw out_of_range("Out of range exception : Matrix::at(" + to_string(i) + "," + to_string(j) + ")");
 			return matrix[i][j];
 		}
