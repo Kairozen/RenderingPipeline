@@ -15,7 +15,7 @@ int main(int argc, char const *argv[])
 			m1[i][j] = i+j;
 		}
 	}
-
+	
 	assert(m1[0][1] == 1);
 	assert(m1[1][1] == 2);
 	assert(m1[2][1] == 3);
@@ -72,6 +72,14 @@ int main(int argc, char const *argv[])
 		}
 	}
 
+	Matrix<3,3,float> test_inv;
+	test_inv[0][0] = 2, test_inv[0][1] = 3, test_inv[0][2] = 8;
+	test_inv[1][0] = 6, test_inv[1][1] = 0, test_inv[1][2] = -3;
+	test_inv[2][0] = -1, test_inv[2][1] = 3, test_inv[2][2] = 2;
+	cout << test_inv << endl;
+	Matrix<3,3,float> inv = test_inv.inverse();
+	cout << inv*test_inv << endl;
+	cout << inv << endl;
 	/*
 	Vector<3,int> v2;
 	v2[0] = 5;

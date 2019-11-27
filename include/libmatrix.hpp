@@ -205,12 +205,33 @@ namespace libmatrix
 	private:
 		T matrix[n][m];
 
+		Matrix null_matrix()
+		{
+			Matrix<n,m,float> res;
+			for (int i = 0; i < n; ++i)
+				for (int j = 0; j < m; ++j)
+					res[i][j] = sqrt(-1);
+			return res;
+		}
+
+		float epsilon = 0.000001;
+
+
 	public:
 		Matrix()
 		{
 			for (int i = 0; i < n; ++i)
 				for (int j = 0; j < m; ++j)
 					matrix[i][j] = 0;	
+		}
+		void swap_rows(int r1, int r2)
+		{
+			for (int i = 0; i < m; ++i)
+			{
+				T tmp = matrix[r1][i];
+				matrix[r1][i] = matrix[r2][i];
+				matrix[r2][i] = tmp; 
+			}
 		}
 
 		~Matrix() {}
@@ -224,7 +245,76 @@ namespace libmatrix
 
 		Matrix inverse()
 		{
-
+			if(n != m)
+				return null_matrix();
+			for (int i = 0; i < n; ++i)
+			{
+				bool col_of_zeros = true;
+				for (int j = 0; j < n; ++j)
+					if(matrix[i][j] != 0)
+					{
+						col_of_zeros = false;
+						break;
+					}
+				if(col_of_zeros)
+					return null_matrix();
+			}
+			for (int i = 0; i < n; ++i)
+			{
+				bool row_of_zeros = true;
+				for (int j = 0; j < n; ++j)
+					if(matrix[j][i] != 0)
+					{
+						row_of_zeros = false;
+						break;
+					}
+				if(row_of_zeros)
+					return null_matrix();
+			}
+			// Iniialisation of left and right matrix
+			Matrix<n,n,T> left, right;
+			for (int i = 0; i < n; ++i)
+				for (int j = 0; j < n; ++j)
+				{
+					left[i][j] = matrix[i][j];
+					if(i==j)
+						right[i][j] = 1;
+				}
+			// For each column of M'
+			for (int col = 0; col < n; ++col)
+			{
+				// Find row with greatest non zero absolute value
+				int row_max = col;
+				for (int row = col; row < n; ++row)
+				{
+					if(abs(left.at(row,col)) > abs(left.at(row_max,col)) && left.at(row,col) != 0)
+						row_max = row;
+				}
+				T max_value = left[row_max][col];
+				// Swap rows i and j
+				left.swap_rows(col,row_max);
+				right.swap_rows(col,row_max);
+				// Multiply row j by 1/M'ij
+				for (int i = 0; i < n; ++i)
+				{
+					left[col][i] *= (1/max_value);
+					right[col][i] *= (1/max_value); 
+				}
+				// For each row r != j, row r = row r + row j * -M'rj
+				for (int r = 0; r < n; ++r)
+				{
+					T factor = - left[r][col];
+					if(r != col)
+					{
+						for (int r_ind = 0; r_ind < n; ++r_ind)
+						{
+							left[r][r_ind] += left[col][r_ind] * factor;
+							right[r][r_ind] += right[col][r_ind] * factor;
+						}
+					}
+				}
+			}
+			return right;
 		}
 
 		bool is_null()
@@ -270,7 +360,7 @@ namespace libmatrix
 			return out;
 		}
 
-		T* operator[](int i)
+		T* operator[](const int i)
 		{
 			return matrix[i];
 		}
@@ -333,6 +423,21 @@ namespace libmatrix
 					tmp += mat.matrix[i][j] * v[j];
 				res[i][0] = tmp;
 			}
+			return res;
+		}
+
+		template <int k>
+		Matrix operator*(Matrix<m,k,T> mat)
+		{
+			Matrix<n,k,T> res;
+			for (int i = 0; i < n; ++i)
+				for (int j = 0; j < k; ++j)
+				{ 
+					for (int z = 0; z < m; ++z)
+						res[i][j] += matrix[i][z] * mat.matrix[z][j];
+					if(abs(res[i][j]) < epsilon)
+						res[i][j] = 0;
+				}
 			return res;
 		}
 
