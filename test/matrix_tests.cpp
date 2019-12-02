@@ -7,6 +7,8 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
+	float epsilon = 0.000001;
+
 	Matrix<4,3, int> m1;
 	for (int i = 0; i < 4; ++i)
 	{
@@ -76,10 +78,34 @@ int main(int argc, char const *argv[])
 	test_inv[0][0] = 2, test_inv[0][1] = 3, test_inv[0][2] = 8;
 	test_inv[1][0] = 6, test_inv[1][1] = 0, test_inv[1][2] = -3;
 	test_inv[2][0] = -1, test_inv[2][1] = 3, test_inv[2][2] = 2;
-	cout << test_inv << endl;
+
 	Matrix<3,3,float> inv = test_inv.inverse();
-	cout << inv*test_inv << endl;
-	cout << inv << endl;
+	Matrix<3,3,float> iden = inv*test_inv;
+	for (size_t i = 0; i < 3; i++)
+	{
+		for (size_t j = 0; j < 3; j++)
+		{
+			if(i==j)
+				assert(abs(iden[i][j]-1) < epsilon);
+			else
+				assert(abs(iden[i][j]) < epsilon);
+		}
+	}
+	
+	Matrix<2,2,float> ortho;
+	ortho[0][0] = 0.96;
+	ortho[0][1] = -0.28;
+	ortho[1][0] = 0.28;
+	ortho[1][1] = 0.96;
+
+	cout << ortho << endl;
+	cout << ortho.transpose() << endl;
+	cout << ortho.inverse() << endl;
+
+	assert(ortho.is_ortho());
+	assert(!test_inv.is_ortho());
+	//cout << inv*test_inv << endl;
+	//cout << inv << endl;
 	/*
 	Vector<3,int> v2;
 	v2[0] = 5;
