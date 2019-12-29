@@ -85,6 +85,9 @@ int main(int argc, char const *argv[])
 	assert(op1[0] == 6);
 	assert(op1[1] == 8);
 	
+	Vec4r brack = {1,2,3,4};
+	for(int i = 0; i < 4; ++i)
+		assert(brack[i] == i+1);
 	cout << "All is right" << endl;
 	return 0;
 }

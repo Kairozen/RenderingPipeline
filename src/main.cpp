@@ -1,18 +1,49 @@
-#include "../include/libmatrix.hpp"
+#include <libgraphic.hpp>
 #include <iostream>
-
-using namespace libmatrix;
+#include <fstream>
+#include <vector>
+using namespace libgraphic;
 using namespace std;
+
+void load_geo_file(const string filename, Scene& scene)
+{
+	ifstream file(filename);
+	if(file)
+	{
+		Object3D obj;
+		obj.name = filename;
+		obj.position = {0,0,0};
+
+		int nb_points, nb_triangles;
+		file >> nb_points;
+		for (int i = 0; i < nb_points; i++)
+		{
+			float c1,c2,c3;
+			file >> c1 >> c2 >> c3;
+			obj.add_vertex(Point<3,float>({c1,c2,c3}));
+		}
+		file >> nb_triangles;
+		for (int i = 0; i < nb_triangles; i++)
+		{
+			int i1,i2,i3;
+			file >> i1 >> i2 >> i3;
+			obj.add_face(i1,i2,i3);
+		}
+		scene.add_object(obj);
+	}
+	else
+	{
+		throw runtime_error("Impossible to read file " + filename);
+	}
+}
 
 int main(int argc, char const *argv[])
 {
-	Matrix<2,3,int> m;
-	m[0][1] = 1;
-	m[1][1] = 2;
-	cout << m << endl;
-	cout << m.transpose() << endl;
-	Matrix<2,3,int> m2;
-	m2[1][1] = 1;
-	cout << m + m2 << endl;
+	Scene scene;
+	for (int i = 0; i < argc-1; i++)
+	{
+		load_geo_file(argv[i+1], scene);
+	}
+	scene.start();	
 	return 0;
 }

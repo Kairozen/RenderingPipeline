@@ -6,7 +6,7 @@
 #include <cstdarg>
 #include <exception>
 #include <typeinfo>
-
+#include <initializer_list>
 using namespace std;
 
 namespace libmatrix
@@ -14,7 +14,7 @@ namespace libmatrix
 	template <int n, class T>
 	class Vector
 	{
-	private:
+	protected:
 		T vec[n];
 
 	public:
@@ -24,13 +24,26 @@ namespace libmatrix
 				vec[i] = 0;
 		}
 
+		Vector(const T array[n])
+		{
+			for (int i = 0; i < n; i++)
+				vec[i] = array[i];
+		}
+
+		Vector(initializer_list<T> list)
+		{
+			int i = 0;
+			for(typename initializer_list<T>::iterator it = list.begin(); it != list.end() && i < n; ++it)
+				vec[i++] = *it;
+		}
+
 		~Vector() {}
 
 		/**
 		 * Addresses the i-th element of the vector
 		 * @param i the index of the element
 		 */
-		T at(int i)
+		T at(int i) const
 		{
 			
 			if(i>=n)
@@ -42,7 +55,7 @@ namespace libmatrix
 		 * Cross product with another vector
 		 * @param v the other vector
 		 */
-		Vector cross(Vector<n,T> &v)
+		Vector cross(const Vector<n,T> &v) const
 		{
 			if(n < 3)
 				throw runtime_error("Vectors have less than 3 dimensions");
@@ -57,7 +70,7 @@ namespace libmatrix
 		 * Dot product with another vector
 		 * @param v the other vector
 		 */
-		float dot(Vector &v)
+		float dot(const Vector &v) const
 		{
 			float res = 0.f;
 			for (int i = 0; i < n; ++i)
@@ -69,7 +82,7 @@ namespace libmatrix
 		 * Returns true if the vector is orthogonal to another given as an argument, false otherwise
 		 * @param v the other vector
 		 */
-		bool is_ortho(Vector &v)
+		bool is_ortho(const Vector &v) const
 		{
 			return dot(v) == 0;
 		}
@@ -77,7 +90,7 @@ namespace libmatrix
 		/**
 		 * Returns true if the vector contains an invalid value, false otherwise. Notably, if the vector contains nan as values
 		 */
-		bool is_null()
+		bool is_null() const
 		{
 			for(int i = 0; i < n; ++i)
 				if(isnan(vec[i]))
@@ -88,7 +101,7 @@ namespace libmatrix
 		/**
 		 * Returns the norm of the vector
 		 */
-		float norm()
+		float norm() const
 		{
 			float norm = 0.f;
 			for (int i = 0; i < n; ++i)
@@ -99,7 +112,7 @@ namespace libmatrix
 		/**
 		 * Returns true if the vector is a unit vector (its norm == 1)
 		 */ 
-		bool is_unit()
+		bool is_unit() const
 		{
 			return norm() == 1.0f;
 		}
@@ -107,7 +120,7 @@ namespace libmatrix
 		/**
 		 * Returns a copy of the vector normalised.
 		 */
-		Vector<n,float> to_unit()
+		Vector<n,float> to_unit() const
 		{
 			Vector<n,float> res;
 			float norm = this->norm();
@@ -136,7 +149,7 @@ namespace libmatrix
 			return *this;
 		}
 
-		Vector operator-(const Vector& v)
+		Vector operator-(const Vector& v) const
 		{
 			Vector<n,T> res;
 			for (int i = 0; i < n; ++i)
@@ -144,7 +157,7 @@ namespace libmatrix
 			return res;
 		}
 
-		Vector operator-()
+		Vector operator-() const
 		{
 			Vector<n,T> res;
 			for (int i = 0; i < n; i++)
@@ -159,7 +172,7 @@ namespace libmatrix
 			return *this;
 		}
 		
-		Vector operator*(float f)
+		Vector operator*(float f) const
 		{
 			Vector<n,T> res;
 			for (int i = 0; i < n; ++i)
@@ -177,14 +190,14 @@ namespace libmatrix
 			return res;
 		}
 
-		Vector& operator*=(float f)
+		Vector& operator*=(const float f)
 		{
 			for (int i = 0; i < n; ++i)
 				vec[i] *= f;
 			return *this;
 		}
 
-		friend ostream& operator<<(ostream &out, const Vector<n,T> v)
+		friend ostream& operator<<(ostream &out, const Vector<n,T>& v)
 		{
 			out << "(";
 			for(int i = 0; i < n; ++i)
@@ -199,10 +212,19 @@ namespace libmatrix
 		}
 	};
 
+	template <int n, class T>
+	Vector<n,T> null_vector()
+	{
+		Vector<n,T> vec;
+		for (int i = 0; i < n; i++)
+			vec[i] = NAN;
+		return vec;
+	}
+
 	template <int n, int m, class T>
 	class Matrix
 	{
-	private:
+	protected:
 		T matrix[n][m];
 
 		Matrix null_matrix()
@@ -210,7 +232,7 @@ namespace libmatrix
 			Matrix<n,m,float> res;
 			for (int i = 0; i < n; ++i)
 				for (int j = 0; j < m; ++j)
-					res[i][j] = sqrt(-1);
+					res[i][j] = NAN;
 			return res;
 		}
 
@@ -236,7 +258,7 @@ namespace libmatrix
 
 		~Matrix() {}
 
-		T at(int i, int j)
+		T at (int i, int j) const
 		{
 			if(i >= n || j >= m)
 				throw out_of_range("Out of range exception : Matrix::at(" + to_string(i) + "," + to_string(j) + ")");
@@ -340,7 +362,7 @@ namespace libmatrix
 			return res;
 		}
 
-		friend ostream& operator<<(ostream &out, Matrix mat)
+		friend ostream& operator<<(ostream &out, const Matrix& mat)
 		{
 			out << "[";
 			for (int i = 0; i < n; ++i)
@@ -365,7 +387,7 @@ namespace libmatrix
 			return matrix[i];
 		}
 
-		Matrix operator+(Matrix mat)
+		Matrix operator+(const Matrix& mat)
 		{
 			Matrix<n,m,T> res;
 			for (int i = 0; i < n; ++i)
@@ -374,7 +396,7 @@ namespace libmatrix
 			return res;
 		}
 
-		Matrix operator+=(Matrix mat)
+		Matrix& operator+=(const Matrix& mat)
 		{
 			for (int i = 0; i < n; ++i)
 				for (int j = 0; j < m; ++j)
@@ -382,7 +404,7 @@ namespace libmatrix
 			return *this;
 		}
 
-		Matrix operator*(float f)
+		Matrix operator*(const float f)
 		{
 			Matrix<n,m,float> res;
 			for (int i = 0; i < n; ++i)
@@ -391,7 +413,7 @@ namespace libmatrix
 			return res;
 		}
 
-		friend Matrix operator*(float f, Matrix mat)
+		friend Matrix operator*(const float f, const Matrix& mat)
 		{
 			Matrix<n,m,float> res;
 			for (int i = 0; i < n; ++i)
@@ -400,34 +422,34 @@ namespace libmatrix
 			return res;
 		}
 
-		Matrix operator*(Vector<m,T> v)
+		Vector<n,T> operator*(const Vector<m,T>& v)
 		{
-			Matrix<n,1,T> res;
+			Vector<n,T> res;
 			for (int i = 0; i < n; ++i)
 			{
 				float tmp = 0;
 				for (int j = 0; j < m; ++j)
-					tmp += matrix[i][j] * v[j];
-				res[i][0] = tmp;
+					tmp += matrix[i][j] * v.at(j);
+				res[i] = tmp;
 			}
 			return res;
 		}
 
-		friend Matrix operator*(Vector<m,T> v, Matrix mat)
+		friend Vector<n,T> operator*(const Vector<m,T>& v, const Matrix& mat)
 		{
-			Matrix<n,1,T> res;
+			Vector<n,T> res;
 			for (int i = 0; i < n; ++i)
 			{
 				float tmp = 0;
 				for (int j = 0; j < m; ++j)
-					tmp += mat.matrix[i][j] * v[j];
-				res[i][0] = tmp;
+					tmp += mat.matrix[i][j] * v.at(j);
+				res[i] = tmp;
 			}
 			return res;
 		}
 
 		template <int k>
-		Matrix operator*(Matrix<m,k,T> mat)
+		Matrix operator*(const Matrix<m,k,T>& mat)
 		{
 			Matrix<n,k,T> res;
 			for (int i = 0; i < n; ++i)
@@ -441,7 +463,7 @@ namespace libmatrix
 			return res;
 		}
 
-		Matrix operator*=(Matrix mat)
+		Matrix& operator*=(const Matrix& mat)
 		{
 			for (int i = 0; i < n; ++i)
 				for (int j = 0; j < m; ++j)
@@ -450,6 +472,19 @@ namespace libmatrix
 		}
 	};
 
+	template<int n, class T>
+	float dot(Vector<n,T> vec1, Vector<n,T> vec2)
+	{
+		return vec1.dot(vec2);
+	}
+
+	template<int n, class T>
+	Vector<n,T> cross(Vector<n,T> vec1, Vector<n,T> vec2)
+	{
+		return vec1.cross(vec2);
+	}
+
+
 	typedef Vector<2,int> Vec2i;
 	typedef Vector<3,int> Vec3i;
 	typedef Vector<4,int> Vec4i;
@@ -457,6 +492,28 @@ namespace libmatrix
 	typedef Vector<3,float> Vec3r;
 	typedef Vector<4,float> Vec4r;
 	typedef Matrix<4,4,float> Mat44r;
+
+	const Vector<3,float> zerovector;
+	const Vector<2,int> zerovec2i;
+	const Vector<3,int> zerovec3i;
+	const Vector<4,int> zerovec4i;
+	const Vector<2,float> zerovec2r;
+	const Vector<3,float> zerovec3r;
+	const Vector<4,float> zerovec4r;
+
+	template<int n, int m, class T>
+	Matrix<n,m,T> identity()
+	{
+		Matrix<n,m,T> mat;
+		for (size_t i = 0; i < n; i++)
+			for (size_t j = 0; j < m; j++)
+				if(i==j)
+					mat[i][j] = 1;
+		return mat;	
+	}
+
+	const Matrix<4,4,int> Identity44i = identity<4,4,int>();
+	const Matrix<4,4,float> Identity44r = identity<4,4,float>();
 }
 
 #endif
