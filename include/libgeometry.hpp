@@ -306,8 +306,7 @@ namespace libgeometry
 
             bool behind(const Plane& plane) const
             {
-                //TODO
-                return false;
+                return center.behind(plane);
             }
 
             friend ostream& operator<<(ostream& out, const Sphere& s)
@@ -595,9 +594,6 @@ namespace libgeometry
                 return out;
             }
     };
-
-
-
 
     template <int N, class T>
     bool Point<N,T>::behind(const Plane& plane) const

@@ -54,22 +54,12 @@ namespace libgraphic
 
             bool oustide(const Point<4,float>& point) const
             {
-                return point.behind(near) ||
-                    point.behind(far) ||
-                    point.behind(left) ||
-                    point.behind(right) ||
-                    point.behind(bottom) ||
-                    point.behind(top);
+                return point.behind(near) || point.behind(far) || point.behind(left) || point.behind(right) || point.behind(bottom) || point.behind(top);
             }
 
             bool outside(const Sphere& sphere) const
             {
-                return sphere.behind(near) ||
-                    sphere.behind(far) ||
-                    sphere.behind(left) ||
-                    sphere.behind(right) ||
-                    sphere.behind(bottom) ||
-                    sphere.behind(top);
+                return sphere.behind(near) || sphere.behind(far) || sphere.behind(left) || sphere.behind(right) || sphere.behind(bottom) || sphere.behind(top);
             }
 
             LineSegment inter(const LineSegment& segment) const
@@ -91,8 +81,8 @@ namespace libgraphic
     {
         private:
             vector<Triangle> faces;
-        public:
             vector<Point<3,float>> vertices;
+        public:
             string name;
             Vec3r position;
 
@@ -143,7 +133,7 @@ namespace libgraphic
     {
         public:
             int height, width;
-            float move_speed = 0.001f, orientation_speed = 0.001f, zoom_speed = 0.1f;
+            float move_speed = 0.002f, orientation_speed = 0.002f, zoom_speed = 0.2f;
 
             Point<3,float> current_position;
             Quaternion<float> current_orientation;
@@ -157,7 +147,7 @@ namespace libgraphic
 
             Camera(float a, float h, float v, float n, float f)
             {
-                current_position = Point<3,float>({0.f,0.f,-1.f});
+                current_position = Point<3,float>({0.f,0.f, -1.f});
                 current_orientation = Quaternion<float>(1.f,Vec3r({0.f,0.f,0.f}));
                 width = h;
                 height = v;
@@ -210,11 +200,11 @@ namespace libgraphic
             }
             void zoom()
             {
-                current_zoom_speed = zoom_speed;
+                current_zoom_speed = -zoom_speed;
             }
             void unzoom()
             {
-                current_zoom_speed = -zoom_speed;
+                current_zoom_speed = zoom_speed;
             }
             void stop_move_up()
             {
@@ -302,8 +292,8 @@ namespace libgraphic
 
             bool sees(const Triangle& triangle) const
             {
-                //TODO
-                return true;
+                return (!frustum.oustide(triangle.get_p0().full_point())) || (!frustum.oustide(triangle.get_p1().full_point())) || (!frustum.oustide
+                (triangle.get_p2().full_point()));
             }
 
             LineSegment visible_part(const LineSegment& segment) const
@@ -319,7 +309,7 @@ namespace libgraphic
                 if(fov_angle > 179.f)
                     fov_angle = 179.f;
                 focal_distance = 1 / tan(((fov_angle*M_PI)/180.f)/2.f);
-                frustum = Frustum(focal_distance,width,height,near,far);
+                frustum.update(width,height,focal_distance);
             }
     };
     class Scene : public SceneInterface
@@ -334,7 +324,7 @@ namespace libgraphic
             Scene()
             {
                 gui = new Gui();
-                camera = Camera(90,50,50,0.01f,10);
+                camera = Camera(90,500,500,0.1f,100);
             }
 
             ~Scene()
@@ -359,8 +349,9 @@ namespace libgraphic
                 for (unsigned int i = 0; i < obj->num_faces(); i++)
                 {
                     Triangle t = obj->face(i);
+                    Triangle t_world = Transform(obj->position, transform_operation::translation).apply(t);
                     //cout << "TRIANGLE " << i << " " << t << endl;
-                    Triangle t_view = camera.view_matrix().apply(t);
+                    Triangle t_view = camera.view_matrix().apply(t_world);
                     if(camera.sees(camera.projection_matrix().apply(t_view))) 
                         draw_wire_triangle(t_view);
                 }

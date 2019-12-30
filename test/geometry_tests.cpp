@@ -11,7 +11,6 @@ int main(int argc, char const *argv[])
 {
 	Quaternion<float> q;
 	cout << q << endl;
-	cout << "All is right" << endl;
 
 	Direction<3,float> d;
 	d[1] = 1;
@@ -29,7 +28,7 @@ int main(int argc, char const *argv[])
 	cout << t << endl;
 	Point<3,float> p({1,1,1});
 	cout << t.apply(p) << endl;
-	//cout << t.to_quat() << endl;
+	cout << t.to_quat() << endl;
 	
 	return 0;
 }

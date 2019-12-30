@@ -5,14 +5,14 @@
 using namespace libgraphic;
 using namespace std;
 
-void load_geo_file(const string filename, Scene& scene)
+void load_geo_file(const string filename, Scene& scene, int num_obj)
 {
 	ifstream file(filename);
 	if(file)
 	{
 		Object3D obj;
 		obj.name = filename;
-		obj.position = {0,0,0};
+		obj.position = {num_obj * 0.3f, 0.f, 0.f};
 
 		int nb_points, nb_triangles;
 		file >> nb_points;
@@ -42,7 +42,7 @@ int main(int argc, char const *argv[])
 	Scene scene;
 	for (int i = 0; i < argc-1; i++)
 	{
-		load_geo_file(argv[i+1], scene);
+		load_geo_file(argv[i+1], scene, i);
 	}
 	scene.start();	
 	return 0;
