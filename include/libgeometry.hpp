@@ -25,7 +25,7 @@ namespace libgeometry
                     this->vec[i] = dir.at(i);
             }
 
-            Direction<N+1,T> full_direction()
+            Direction<N+1,T> full_direction() const
             {
                 Direction<N+1,T> res;
                 for (int i = 0; i < N; i++)
@@ -356,6 +356,11 @@ namespace libgeometry
                 return c;
             }
 
+            Point<3,float> get_center() const
+            {
+                return ((Vec3r)a + b + c) * (1/3); 
+            }
+
             float area()
             {
                 Vec3r ab = b - a;
@@ -495,7 +500,7 @@ namespace libgeometry
 
             Transform(const Mat44r& m): transform_matrix(m) {}
 
-            Mat44r get_matrix()
+            Mat44r get_matrix() const
             {
                 return transform_matrix;
             }
@@ -545,13 +550,13 @@ namespace libgeometry
                 }
             }
 
-            Transform concat(Transform t)
+            Transform concat(const Transform t) const
             {
                 return Transform(t.transform_matrix * transform_matrix);
             }
 
             template <class T>
-            Point<3,T> apply(const Point<3,T>& p)
+            Point<3,T> apply(const Point<3,T>& p) const
             {
                 Point<4,float> pt = apply(p.full_point());
                 Point<3,float> res({pt.at(0), pt.at(1), pt.at(2)});
@@ -559,7 +564,7 @@ namespace libgeometry
             }
 
             template <class T>
-            Direction<3,T> apply(const Direction<3,T>& d)
+            Direction<3,T> apply(const Direction<3,T>& d) const
             {
                 Direction<4,float> dir = apply(d.full_direction());
                 Direction<3,float> res({dir.at(0), dir.at(1), dir.at(2)});
@@ -567,23 +572,23 @@ namespace libgeometry
             }
 
             template <class T>
-            Point<4,T> apply(const Point<4,T>& p)
+            Point<4,T> apply(const Point<4,T>& p) const
             {
                 return Point<4,T>(transform_matrix * p); 
             }
 
             template <class T>
-            Direction<4,T> apply(const Direction<4,T>& d)
+            Direction<4,T> apply(const Direction<4,T>& d) const
             {
-                return Point<4,T>(transform_matrix * d);
+                return Direction<4,T>(transform_matrix * d);
             }
 
-            Triangle apply(const Triangle& t)
+            Triangle apply(const Triangle& t) const
             {
                 return Triangle(apply(t.get_p0()), apply(t.get_p1()), apply(t.get_p2()));
             }
 
-            Sphere apply(const Sphere& s)
+            Sphere apply(const Sphere& s) const
             {
                 return Sphere(apply(s.get_center()), s.get_radius());
             }

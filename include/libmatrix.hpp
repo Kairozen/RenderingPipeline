@@ -387,7 +387,7 @@ namespace libmatrix
 			return matrix[i];
 		}
 
-		Matrix operator+(const Matrix& mat)
+		Matrix operator+(const Matrix& mat) const
 		{
 			Matrix<n,m,T> res;
 			for (int i = 0; i < n; ++i)
@@ -404,7 +404,7 @@ namespace libmatrix
 			return *this;
 		}
 
-		Matrix operator*(const float f)
+		Matrix operator*(const float f) const
 		{
 			Matrix<n,m,float> res;
 			for (int i = 0; i < n; ++i)
@@ -422,7 +422,7 @@ namespace libmatrix
 			return res;
 		}
 
-		Vector<n,T> operator*(const Vector<m,T>& v)
+		Vector<n,T> operator*(const Vector<m,T>& v) const
 		{
 			Vector<n,T> res;
 			for (int i = 0; i < n; ++i)
@@ -449,7 +449,7 @@ namespace libmatrix
 		}
 
 		template <int k>
-		Matrix operator*(const Matrix<m,k,T>& mat)
+		Matrix operator*(const Matrix<m,k,T>& mat) const
 		{
 			Matrix<n,k,T> res;
 			for (int i = 0; i < n; ++i)

@@ -262,12 +262,12 @@ namespace libgraphic
                 float right = near / focal_distance;
                 float top = near / focal_distance;
                 float bottom = -near / focal_distance;
-                m[0][0] = (2 * near) / (right - left);
+                m[0][0] = (2.f * near) / (right - left);
                 m[0][2] = (right + left) / (right - left);
-                m[1][1] = (2 * near) / (top - bottom);
+                m[1][1] = (2.f * near) / (top - bottom);
                 m[1][2] = (top + bottom) / (top - bottom);
                 m[2][2] = -((far + near) / (far - near));
-                m[2][3] = -((2 * near * far) / (far - near));
+                m[2][3] = -((2.f * near * far) / (far - near));
                 m[3][2] = -1.f;
                 //cout << m << endl;
                 return Transform(m);
@@ -292,8 +292,11 @@ namespace libgraphic
 
             bool sees(const Triangle& triangle) const
             {
-                return (!frustum.oustide(triangle.get_p0().full_point())) || (!frustum.oustide(triangle.get_p1().full_point())) || (!frustum.oustide
-                (triangle.get_p2().full_point()));
+                Direction<3,float> d1 = triangle.get_p0().length_to(triangle.get_p1());
+                Direction<3,float> d2 = triangle.get_p0().length_to(triangle.get_p2());
+                Vec3r triangle_normal = d1.cross(d2).to_unit();
+                Direction<3,float> cam_direction({current_position.at(0), current_position.at(1), 1});
+                return (cam_direction).dot(triangle_normal) > 0.f;
             }
 
             LineSegment visible_part(const LineSegment& segment) const
