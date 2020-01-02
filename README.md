@@ -17,3 +17,9 @@ Q and E : Unzoom and zoom.
 Arrow keys : Rotate the objects.
 
 Multiple .geo file can be displayed, objects will be put next to each other
+
+Speed of the rotations, translations and zoom can be changed in ```include/libgraphic.hpp```
+
+Known problems : 
+
+- When loading multiple objects, the hidden faces are not properly applied on the objects and it seems all objects world position are counted as (0,0,0) when it's not the case

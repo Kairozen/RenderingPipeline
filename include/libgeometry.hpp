@@ -12,8 +12,6 @@ using namespace std;
 using namespace libmatrix;
 namespace libgeometry
 {
-    const float epsilon = 0.000001;
-
     template <int N, class T>
     class Direction : public Vector<N,T>
     {

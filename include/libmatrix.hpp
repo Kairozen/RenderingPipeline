@@ -11,6 +11,7 @@ using namespace std;
 
 namespace libmatrix
 {
+	const float epsilon = 0.000001;
 	template <int n, class T>
 	class Vector
 	{
@@ -235,8 +236,6 @@ namespace libmatrix
 					res[i][j] = NAN;
 			return res;
 		}
-
-		float epsilon = 0.000001;
 
 
 	public:

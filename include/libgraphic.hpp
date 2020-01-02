@@ -18,6 +18,9 @@ using namespace gui;
 
 namespace libgraphic
 {
+    const float SPEED = 0.001f;
+    const float ZOOM_SPEED = 0.1f;
+
     class Frustum
     {
         private:
@@ -133,7 +136,7 @@ namespace libgraphic
     {
         public:
             int height, width;
-            float move_speed = 0.002f, orientation_speed = 0.002f, zoom_speed = 0.2f;
+            float move_speed = SPEED, orientation_speed = SPEED, zoom_speed = ZOOM_SPEED;
 
             Point<3,float> current_position;
             Quaternion<float> current_orientation;
@@ -294,9 +297,9 @@ namespace libgraphic
             {
                 Direction<3,float> d1 = triangle.get_p0().length_to(triangle.get_p1());
                 Direction<3,float> d2 = triangle.get_p0().length_to(triangle.get_p2());
-                Vec3r triangle_normal = d1.cross(d2).to_unit();
+                Vec3r triangle_normal = d1.cross(d2);
                 Direction<3,float> cam_direction({current_position.at(0), current_position.at(1), 1});
-                return (cam_direction).dot(triangle_normal) > 0.f;
+                return (cam_direction).dot(triangle_normal) > epsilon;
             }
 
             LineSegment visible_part(const LineSegment& segment) const
@@ -308,6 +311,7 @@ namespace libgraphic
             {
                 current_position += current_speed;
                 current_orientation = current_orientation * Quaternion<float>(1.f,current_orientation_speed);
+                current_orientation = current_orientation.to_norm();
                 fov_angle += current_zoom_speed;
                 if(fov_angle > 179.f)
                     fov_angle = 179.f;
@@ -398,7 +402,9 @@ namespace libgraphic
             {
                 for(Object3D obj : objects)
                 {
-                    Sphere obj_proj = camera.view_matrix().concat(camera.projection_matrix()).apply(obj.bsphere());
+                    Sphere obj_sphere = Transform(obj.position, transform_operation::translation).apply(obj_sphere);
+
+                    Sphere obj_proj = camera.view_matrix().concat(camera.projection_matrix()).apply(obj_sphere);
                     if(!camera.outside_frustum(obj_proj))
                         draw_object(&obj);
                 }
