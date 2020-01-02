@@ -7,6 +7,8 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
+	float epsilon = 0.000001;
+
 	Matrix<4,3, int> m1;
 	for (int i = 0; i < 4; ++i)
 	{

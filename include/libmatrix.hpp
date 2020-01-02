@@ -349,7 +349,23 @@ namespace libmatrix
 
 		bool is_ortho()
 		{
-			return false;
+			Matrix transp = transpose();
+			Matrix res = *this * transp;
+			for (size_t i = 0; i < n; i++)
+				for (size_t j = 0; j < m; j++)
+				{
+					if(i == j)
+					{
+						if(!(res[i][j] <= 1 + epsilon && res[i][j] >= 1 - epsilon))
+							return false;
+					}
+					else 
+					{
+						if(!(res[i][j] <= 0 + epsilon && res[i][j] >= 0 - epsilon))
+							return false;
+					}
+				}			
+			return true;
 		}
 
 		Matrix<m,n,T> transpose()
